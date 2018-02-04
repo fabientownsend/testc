@@ -24,7 +24,7 @@ TEST(myheader, willFail)
 TEST(myheader, newTest)
 {
   int result = aNewFunction();
-  TEST_ASSERT(result == 4);
+  TEST_ASSERT(result == 6);
 }
 
 TEST_GROUP_RUNNER(myheaer) {

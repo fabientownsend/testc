@@ -1,10 +1,34 @@
+#include <stdint.h>
 #include "myheader.h"
 
-int add(int a, int b)
+enum {
+  ALL_LEDS_ON = ~0,
+  ALL_LEDS_OFF = ~ALL_LEDS_ON
+};
+
+static uint16_t *ledAddress;
+
+void LedDriver_Create(uint16_t *address)
 {
-  return a + b;
+  ledAddress = address;
+  *ledAddress = ALL_LEDS_OFF;
 }
 
-int aNewFunction() {
-  return 6;
+static uint16_t convertLedNumberToBit(ledNumber) {
+  return 1 << (ledNumber - 1);
+}
+
+void LedDriver_TurnOn(int ledNumber)
+{
+  *ledAddress |= convertLedNumberToBit(ledNumber);
+}
+
+void LedDriver_TurnOff(int ledNumber)
+{
+  *ledAddress &= ~(convertLedNumberToBit(ledNumber));
+}
+
+void LedDriver_TurnAllOn()
+{
+  *ledAddress = ALL_LEDS_ON;
 }

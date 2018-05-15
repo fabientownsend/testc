@@ -2,54 +2,93 @@
 #include "myheader.h"
 #include "unity_fixture.h"
 
-TEST_GROUP(myheader);
-TEST_SETUP(myheader) { }
-TEST_TEAR_DOWN(myheader) { }
+TEST_GROUP(LedDriver);
+TEST_SETUP(LedDriver) { }
+TEST_TEAR_DOWN(LedDriver) { }
 
-TEST(myheader, willReturnTwo)
+TEST(LedDriver, LedsOffAfterCreate)
 {
-  TEST_ASSERT(add(1, 1) == 2);
+  uint16_t virtualLeds = 0xffff;
+
+  LedDriver_Create(&virtualLeds);
+
+  TEST_ASSERT_EQUAL_HEX16(0x0000, virtualLeds);
 }
 
-TEST(myheader, willReturnFour)
+TEST(LedDriver, TurnOnLedOne)
 {
-  TEST_ASSERT(add(2, 2) == 4);
+  uint16_t virtualLeds = 0xffff;
+  LedDriver_Create(&virtualLeds);
+
+  LedDriver_TurnOn(1);
+
+  TEST_ASSERT_EQUAL_HEX16(1, virtualLeds);
 }
 
-TEST(myheader, willFail)
+TEST(LedDriver, TurnOffLedOne)
 {
-  TEST_ASSERT(add(1, 3) == 4);
+  uint16_t virtualLeds = 0xffff;
+  LedDriver_Create(&virtualLeds);
+
+  LedDriver_TurnOn(1);
+  LedDriver_TurnOff(1);
+
+  TEST_ASSERT_EQUAL_HEX16(0x0000, virtualLeds);
 }
 
-TEST(myheader, newTest)
+TEST(LedDriver, TurnOnMultipleLeds)
 {
-  int result = aNewFunction();
-  TEST_ASSERT(result == 6);
+  uint16_t virtualLeds = 0xffff;
+  LedDriver_Create(&virtualLeds);
+
+  LedDriver_TurnOn(8);
+  LedDriver_TurnOn(9);
+
+  TEST_ASSERT_EQUAL_HEX16(0x0180, virtualLeds);
 }
 
-TEST_GROUP_RUNNER(myheaer) {
-  RUN_TEST_CASE(myheader, willReturnTwo);
-  RUN_TEST_CASE(myheader, willReturnFour);
-  RUN_TEST_CASE(myheader, willFail);
-}
-
-void LedDriver_Create(uint16_t *address)
+TEST(LedDriver, TurnAllLedsOn)
 {
-  *address = 0;
+  uint16_t virtualLeds = 0xffff;
+  LedDriver_Create(&virtualLeds);
+
+  LedDriver_TurnAllOn();
+
+  TEST_ASSERT_EQUAL_HEX16(0xffff, virtualLeds);
 }
+
+TEST(LedDriver, TurnOffAnyLed)
+{
+  uint16_t virtualLeds = 0xffff;
+  LedDriver_Create(&virtualLeds);
+  LedDriver_TurnAllOn();
+
+  LedDriver_TurnOff(8);
+
+  TEST_ASSERT_EQUAL_HEX16(0xff7f, virtualLeds);
+}
+
+TEST(LedDriver, LedMemoryIsNotReable)
+{
+  uint16_t virtualLeds = 0xffff;
+
+  LedDriver_TurnOn(8);
+
+  // TEST_ASSERT_EQUAL_HEX16(80, virtualLeds);
+}
+
 
 static void runAllTests() {
-  RUN_TEST_CASE(myheader, willReturnTwo);
-  RUN_TEST_CASE(myheader, willReturnFour);
-  RUN_TEST_CASE(myheader, willFail);
-  RUN_TEST_CASE(myheader, newTest);
+  RUN_TEST_CASE(LedDriver, LedsOffAfterCreate);
+  RUN_TEST_CASE(LedDriver, TurnOnLedOne);
+  RUN_TEST_CASE(LedDriver, TurnOffLedOne);
+  RUN_TEST_CASE(LedDriver, TurnOnMultipleLeds);
+  RUN_TEST_CASE(LedDriver, TurnAllLedsOn);
+  RUN_TEST_CASE(LedDriver, TurnOffAnyLed);
+  RUN_TEST_CASE(LedDriver, LedMemoryIsNotReable);
 }
 
 int main(int argc, const char* argv[])
 {
-  uint16_t virtualLeds = 0xffff;
-  printf("before virtual led: %d\n", virtualLeds);
-  LedDriver_Create(&virtualLeds);
-  printf("after virtual led: %d\n", virtualLeds);
   UnityMain(argc, argv, runAllTests);
 }
